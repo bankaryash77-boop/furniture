@@ -1173,4 +1173,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // FIX: was outside .then() — must run AFTER sheet prices are applied
     updateHomeFeaturedCards();
   });
+
 });
