@@ -243,6 +243,110 @@
 }
 .stars { color: var(--gold); font-size: .82rem; }
 
+  
+    /* ── Mobile filter toggle button ── */
+    .mobile-filter-btn {
+      display: none;
+      align-items: center;
+      gap: .5rem;
+      background: var(--green, #1e4035);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: .6rem 1.2rem;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 12px rgba(30,64,53,.18);
+    }
+    .filter-active-dot {
+      width: 8px; height: 8px;
+      background: #f59e0b;
+      border-radius: 50%;
+      display: none;
+      position: absolute;
+      top: 6px; right: 10px;
+    }
+    .filter-active-dot.visible { display: block; }
+
+    /* ── Sidebar overlay (mobile) ── */
+    .sidebar-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 1100;
+      backdrop-filter: blur(2px);
+    }
+    .sidebar-overlay.open { display: block; }
+
+    /* ── Sidebar close button (mobile only) ── */
+    .sidebar-close-btn {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: #888;
+      padding: 2px 6px;
+      line-height: 1;
+    }
+
+    @media (max-width: 860px) {
+      .mobile-filter-btn { display: flex; }
+      .sidebar-close-btn { display: block; }
+
+      /* Sidebar becomes a slide-up bottom drawer on mobile */
+      .shop-sidebar {
+        position: fixed !important;
+        left: 0; right: 0; bottom: 0;
+        top: auto !important;
+        width: 100% !important;
+        max-height: 82vh;
+        overflow-y: auto;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -8px 40px rgba(0,0,0,.18);
+        z-index: 1200;
+        transform: translateY(110%);
+        transition: transform .35s cubic-bezier(.4,0,.2,1);
+        background: #fff;
+        padding: 1.2rem 1.4rem 2rem;
+      }
+      .shop-sidebar.open {
+        transform: translateY(0);
+      }
+
+      /* Hide apply button inside sidebar on mobile — use the one in drawer footer */
+      .shop-sidebar #applyBtnMobile { display: flex; }
+
+      /* Slightly compact filter groups */
+      .filter-group { margin-bottom: 1.2rem; padding-bottom: 1.2rem; }
+      .filter-group h4 { font-size: .85rem; margin-bottom: .6rem; }
+
+      /* Pull bar at top of drawer */
+      .shop-sidebar::before {
+        content: '';
+        display: block;
+        width: 40px; height: 4px;
+        background: #ddd;
+        border-radius: 2px;
+        margin: 0 auto .8rem;
+      }
+
+      /* Sticky apply button at bottom of drawer */
+      #applyBtn {
+        position: sticky;
+        bottom: 0;
+        width: 100%;
+        justify-content: center;
+        margin-top: 1rem;
+        border-radius: 12px;
+        z-index: 1;
+      }
+    }
+  
+
 /* ── Pagination ── */
 .pagination {
   display: flex;
