@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shop — Furni.</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/shop.css" />
+  <link rel="stylesheet" href="../css/shop-upgrade.css" />
+</head>
+<body class="light-page">
+
+  <nav class="navbar light">
+    <div class="container nav-inner">
+      <a href="../index.html" class="nav-logo" style="color:var(--green)">Furni.</a>
+      <ul class="nav-links">
+        <li><a href="../index.html"   class="nav-link">Home</a></li>
+        <li><a href="shop.html"       class="nav-link active">Shop</a></li>
+        <li><a href="about.html"      class="nav-link">About Us</a></li>
+        <li><a href="contact.html"    class="nav-link">Contact</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="#" class="icon-btn" aria-label="Cart" style="color:var(--text-mid);position:relative">
+          <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 29.3332C12.7363 29.3332 13.3333 28.7362 13.3333 27.9998C13.3333 27.2635 12.7363 26.6665 12 26.6665C11.2636 26.6665 10.6666 27.2635 10.6666 27.9998C10.6666 28.7362 11.2636 29.3332 12 29.3332Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M26.6667 29.3332C27.4031 29.3332 28 28.7362 28 27.9998C28 27.2635 27.4031 26.6665 26.6667 26.6665C25.9303 26.6665 25.3334 27.2635 25.3334 27.9998C25.3334 28.7362 25.9303 29.3332 26.6667 29.3332Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M1.33337 1.3335H6.66671L10.24 19.1868C10.362 19.8007 10.6959 20.3521 11.1834 20.7446C11.671 21.137 12.281 21.3455 12.9067 21.3335H25.8667C26.4924 21.3455 27.1025 21.137 27.59 20.7446C28.0775 20.3521 28.4114 19.8007 28.5334 19.1868L30.6667 8.00016H8.00004" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="cart-count" style="display:none">0</span>
+        </a>
+        <div class="hamburger">
+          <span style="background:var(--text-dark)"></span>
+          <span style="background:var(--text-dark)"></span>
+          <span style="background:var(--text-dark)"></span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="mobile-menu">
+    <a href="../index.html">Home</a>
+    <a href="shop.html">Shop</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+  </div>
+
+  <section class="page-hero">
+    <div class="container">
+      <span class="section-tag">Browse &amp; Discover</span>
+      <h1 class="section-title">Our <span>Collections</span></h1>
+      <p class="section-sub">Handpicked furniture for every room and every taste.</p>
+    </div>
+  </section>
+
+  <section class="shop-section">
+    <div class="container shop-layout">
+
+      <!-- SIDEBAR FILTERS -->
+      <aside class="shop-sidebar">
+        <div class="sidebar-header">
+          <h3>Filters</h3>
+          <button class="clear-filters" id="clearFilters">Clear All</button>
+        </div>
+
+        <div class="filter-group">
+          <h4>Category</h4>
+          <label><input type="radio" name="cat" value="all" checked /> All Products</label>
+          <label><input type="radio" name="cat" value="sofas" /> Sofas</label>
+          <label><input type="radio" name="cat" value="chairs" /> Chairs</label>
+          <label><input type="radio" name="cat" value="tables" /> Tables</label>
+          <label><input type="radio" name="cat" value="stools" /> Stools</label>
+          <label><input type="radio" name="cat" value="accessories" /> Accessories</label>
+        </div>
+
+        <div class="filter-group">
+          <h4>Price Range</h4>
+          <div class="price-range">
+            <span>₹0</span>
+            <input type="range" min="0" max="25000" value="25000" id="priceRange" />
+            <span id="priceVal">₹25000</span>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <h4>Colour</h4>
+          <div class="color-options">
+            <button class="color-dot" data-color="green"   style="background:#1e4035" title="Green"></button>
+            <button class="color-dot" data-color="teal"    style="background:#5a8a7e" title="Teal"></button>
+            <button class="color-dot" data-color="cream"   style="background:#e8e0d0;border:1px solid #ccc" title="Cream"></button>
+            <button class="color-dot" data-color="brown"   style="background:#8a7a62" title="Brown"></button>
+            <button class="color-dot" data-color="blue"    style="background:#4a6fa5" title="Blue"></button>
+            <button class="color-dot" data-color="red"     style="background:#c0392b" title="Red"></button>
+            <button class="color-dot" data-color="mustard" style="background:#e0a832" title="Mustard"></button>
+            <button class="color-dot" data-color="grey"    style="background:#808080" title="Grey"></button>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <h4>Min. Rating</h4>
+          <label><input type="radio" name="rating" value="0" checked /> All Ratings</label>
+          <label><input type="radio" name="rating" value="5" /> ★★★★★ 5 star</label>
+          <label><input type="radio" name="rating" value="4" /> ★★★★☆ 4 star+</label>
+          <label><input type="radio" name="rating" value="3" /> ★★★☆☆ 3 star+</label>
+        </div>
+
+        <button class="btn btn-dark" id="applyBtn" style="width:100%;justify-content:center;margin-top:1rem">Apply Filters</button>
+      </aside>
+
+      <!-- PRODUCTS -->
+      <div class="shop-main">
+        <div class="shop-toolbar">
+          <p class="results-count">Showing <strong id="resultCount">12</strong> products</p>
+          <div class="toolbar-right">
+            <div class="search-bar-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input type="text" id="searchInput" placeholder="Search products…" autocomplete="off" />
+              <button id="searchBtn">Search</button>
+            </div>
+            <select class="sort-select" id="sortSelect">
+              <option value="featured">Featured</option>
+              <option value="price-asc">Price: Low → High</option>
+              <option value="price-desc">Price: High → Low</option>
+              <option value="rating">Top Rated</option>
+              <option value="newest">Newest</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="shop-grid" id="shopGrid"></div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+  </section>
+
+
+    <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="../index.html" class="nav-logo">Furni.</a>
+          <p>Modern furniture for modern living.</p>
+          <div class="newsletter-form">
+            <input type="email" placeholder="Your email" />
+            <button type="button">&#10148;</button>
+          </div>
+          <div class="footer-socials">
+            <a href="#" class="social-icon">f</a>
+            <a href="#" class="social-icon">in</a>
+            <a href="#" class="social-icon">&#128247;</a>
+            <a href="#" class="social-icon">X</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="#">Support Center</a></li>
+            <li><a href="#">Live Chat</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Products</h4>
+          <ul>
+            <li><a href="#">Nordic Chair</a></li>
+            <li><a href="#">Kruzo Chair</a></li>
+            <li><a href="#">Ergonomic Chair</a></li>
+            <li><a href="#">Velvet Sofa</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Furni. All Rights Reserved.</p>
+        <div style="display:flex;gap:1.5rem">
+          <a href="#">Terms</a><a href="#">Privacy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  
+  <script src="../js/common.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/shop.js"></script>
+  <!-- WhatsApp Float -->
+  <a href="https://wa.me/919373828887" class="wa-float" target="_blank" rel="noopener" aria-label="Chat on WhatsApp" title="Chat on WhatsApp">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+</body>
+</html>

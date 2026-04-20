@@ -1,0 +1,203 @@
+================================================================
+  FURNI. WEBSITE — SETUP GUIDE
+  Google Sheets Live Prices + UPI Payment
+================================================================
+
+================================================================
+PART 1: GOOGLE SHEETS LIVE PRICE SETUP
+================================================================
+
+STEP 1 — Import the CSV into Google Sheets
+-------------------------------------------
+1. Go to sheets.google.com and create a New Spreadsheet
+2. Name it "Furni Product Prices"
+3. Go to File → Import → Upload
+4. Upload the file: furni_products_template.csv
+5. Select "Replace spreadsheet" → Import Data
+
+Your sheet will have these columns:
+  A: id | B: name | C: price | D: oldPrice | E: badge | F: category | G: active
+
+HOW TO UPDATE PRICES:
+  - Just edit the "price" column for any product
+  - Changes go live on the website automatically
+  - Leave oldPrice empty if there's no sale, add a number if on sale
+  - Set active to FALSE to hide a product from the shop
+
+----------------------------------------------------------------
+
+STEP 2 — Create the Google Apps Script
+----------------------------------------
+1. In your Google Sheet, go to: Extensions → Apps Script
+2. Delete all existing code in the editor
+3. Paste the following code EXACTLY:
+
+--- COPY FROM HERE ---
+
+function doGet(e) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const data  = sheet.getDataRange().getValues();
+  const headers = data[0]; // first row = column names
+  
+  const products = [];
+  for (let i = 1; i < data.length; i++) {
+    const row = {};
+    headers.forEach((h, j) => { row[h] = data[i][j]; });
+    if (row.active !== false && row.active !== 'FALSE') {
+      products.push({
+        id:       Number(row.id),
+        name:     String(row.name),
+        price:    Number(row.price),
+        oldPrice: row.oldPrice ? Number(row.oldPrice) : null,
+        badge:    row.badge   || null,
+        category: row.category || ''
+      });
+    }
+  }
+  
+  return ContentService
+    .createTextOutput(JSON.stringify(products))
+    .setMimeType(ContentService.MimeType.JSON)
+    .setHeader('Access-Control-Allow-Origin', '*');  // allow website to fetch
+}
+
+--- COPY TO HERE ---
+
+4. Click the floppy disk icon (Save) — name it "Furni Prices API"
+5. Click "Deploy" → "New Deployment"
+6. Click the gear icon next to "Type" → select "Web App"
+7. Fill in:
+     Description: Furni Prices
+     Execute as: Me
+     Who has access: Anyone
+8. Click "Deploy"
+9. You will see a URL like:
+     https://script.google.com/macros/s/AKfyc.../exec
+10. COPY THAT URL — you need it in the next step
+
+IMPORTANT: Every time you edit the Apps Script code,
+you must click Deploy → Manage Deployments → Edit → New Version → Deploy
+to update the live script.
+
+----------------------------------------------------------------
+
+STEP 3 — Connect the URL to your website
+------------------------------------------
+1. Open the file: js/common.js in any text editor (VS Code, Notepad++)
+2. Find these two lines near the top:
+
+     const SHEETS_ENABLED  = false;
+     const SHEETS_API_URL  = 'YOUR_APPS_SCRIPT_URL_HERE';
+
+3. Change them to:
+
+     const SHEETS_ENABLED  = true;
+     const SHEETS_API_URL  = 'https://script.google.com/macros/s/YOUR_ACTUAL_ID/exec';
+
+4. Save the file
+
+That's it! Now when customers visit your website:
+  → JavaScript calls your Apps Script URL
+  → Gets latest prices from the sheet
+  → Updates the product grid automatically
+
+----------------------------------------------------------------
+
+HOW TO CHANGE A PRICE (after setup):
+  1. Open your Google Sheet
+  2. Find the product row
+  3. Change the number in column C (price)
+  4. Done! The website shows the new price within seconds.
+
+HOW TO PUT A PRODUCT ON SALE:
+  1. Change the price in column C to the SALE price (e.g. 699)
+  2. Add the original price in column D / oldPrice (e.g. 899)
+  3. Add "Sale" in column E / badge
+  4. The product card will show Sale badge and strikethrough price.
+
+HOW TO HIDE A PRODUCT:
+  1. Change column G / active to: FALSE
+  2. It disappears from the shop immediately.
+
+================================================================
+PART 2: UPI PAYMENT SETUP
+================================================================
+
+STEP 1 — Add your UPI ID to the website
+-----------------------------------------
+1. Open js/common.js in any text editor
+2. Find these lines:
+
+     const UPI_ID   = 'YOUR_UPI_ID@paytm';
+     const UPI_NAME = 'Furni Store';
+
+3. Replace YOUR_UPI_ID@paytm with your actual UPI ID.
+
+Examples:
+  PhonePe:  9373828887@ybl
+  GPay:     9373828887@okicici  or  yourname@oksbi
+  Paytm:    9373828887@paytm
+  BHIM:     yourname@upi
+
+To find your UPI ID:
+  PhonePe → Profile → UPI IDs
+  GPay    → Settings → Payment Methods → UPI
+  Paytm   → Profile → My UPI IDs
+
+4. Also update UPI_NAME to your shop name.
+5. Save the file.
+
+----------------------------------------------------------------
+
+HOW THE PAYMENT FLOW WORKS:
+  1. Customer adds items to cart
+  2. Opens cart drawer
+  3. Sees order total
+  4. Clicks "Pay Now — UPI"
+  5. On mobile → UPI app (PhonePe/GPay/Paytm) opens automatically
+     with the EXACT order total pre-filled
+  6. Customer pays
+  7. Returns to website
+  8. Sees bold yellow notice:
+       "📸 Take a screenshot of your payment confirmation
+        and share it on WhatsApp to confirm your order"
+  9. Customer clicks "Send Order on WhatsApp"
+  10. WhatsApp opens with full order details
+  11. Customer sends their payment screenshot in the same chat
+
+NOTE: On desktop/laptop, UPI deep links don't work (no UPI app).
+The website will show a toast message with your UPI ID so the
+customer can pay manually. Consider also adding a QR code image
+for desktop customers.
+
+----------------------------------------------------------------
+
+HOW YOU RECEIVE PAYMENT CONFIRMATIONS:
+  → Customer pays via UPI → you get bank notification instantly
+  → Customer sends WhatsApp message with order + screenshot
+  → You confirm the order on WhatsApp
+  → You can also check your Google Sheet orders form (if set up)
+
+================================================================
+PART 3: QUICK REFERENCE
+================================================================
+
+FILES CHANGED:
+  js/common.js — main logic (edit UPI ID and Sheets URL here)
+
+VALUES TO UPDATE IN common.js:
+  Line ~8:  SHEETS_ENABLED  = false  →  true  (after sheet is ready)
+  Line ~9:  SHEETS_API_URL  = 'YOUR_APPS_SCRIPT_URL_HERE'
+  Line ~280: UPI_ID  = 'YOUR_UPI_ID@paytm'
+  Line ~281: UPI_NAME = 'Furni Store'  →  your shop name
+  Line ~1:  WHATSAPP_NUMBER = '919373828887'  →  keep or update
+
+TESTING:
+  → Test on a real mobile phone for UPI (doesn't work on desktop)
+  → Send a test WhatsApp order to yourself first
+  → Check the Google Sheet loads by opening browser console (F12)
+    and looking for: "✅ Prices updated from Google Sheets"
+
+================================================================
+Need help? The code comments in common.js explain everything.
+================================================================

@@ -1,0 +1,198 @@
+/* ============================================
+   FURNI. — About Page Styles
+   ============================================ */
+
+.navbar.light .nav-logo { color: var(--green) !important; }
+.navbar.light .nav-link { color: var(--text-mid); }
+.navbar.light .nav-link:hover,
+.navbar.light .nav-link.active { color: var(--text-dark); }
+.navbar.light .icon-btn { color: var(--text-mid); }
+.navbar.light .hamburger span { background: var(--text-dark); }
+
+/* ── About Hero ── */
+.about-hero {
+  position: relative;
+  height: 80vh;
+  min-height: 520px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.about-hero-img {
+  position: absolute;
+  inset: 0;
+}
+.about-hero-img img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.about-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(20,45,35,.6);
+}
+.about-hero-content {
+  position: relative;
+  z-index: 2;
+  color: var(--white);
+  padding-top: 5rem;
+}
+.about-hero-content .hero-title {
+  font-family: var(--font-head);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.15;
+  margin: .75rem 0 1rem;
+}
+.about-hero-content .hero-title em { color: var(--gold); font-style: italic; }
+.about-hero-content > p { color: rgba(255,255,255,.72); font-size: 1.05rem; max-width: 500px; }
+
+/* ── Story Grid ── */
+.story-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+.story-images {
+  position: relative;
+  height: 520px;
+}
+.story-img-top {
+  position: absolute;
+  top: 0; left: 0;
+  width: 75%;
+  height: 340px;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+}
+.story-img-bottom {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 65%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  border: 4px solid var(--white);
+  box-shadow: var(--shadow);
+}
+.story-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin-top: 2.5rem;
+}
+.story-stat {
+  background: var(--cream);
+  padding: 1.2rem;
+  border-radius: var(--radius);
+  text-align: center;
+  border: 1px solid var(--border);
+}
+.story-stat strong {
+  display: block;
+  font-family: var(--font-head);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--green);
+}
+.story-stat span { font-size: .82rem; color: var(--text-muted); }
+
+/* ── Values ── */
+.values-section { background: var(--green-light); }
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+.value-card {
+  background: var(--white);
+  padding: 2rem 1.5rem;
+  border-radius: var(--radius-lg);
+  text-align: center;
+  border: 1px solid var(--border);
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+.value-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+}
+.value-icon { font-size: 2rem; margin-bottom: 1rem; }
+.value-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: .6rem;
+}
+.value-card p { font-size: .9rem; color: var(--text-mid); line-height: 1.75; }
+
+/* ── Team ── */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+.team-card { text-align: center; }
+.team-img {
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  margin-bottom: 1rem;
+  background: var(--cream);
+}
+.team-img img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .4s ease;
+}
+.team-card:hover .team-img img { transform: scale(1.05); }
+.team-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: .3rem; }
+.team-card span { font-size: .85rem; color: var(--text-muted); }
+
+/* ── Gallery ── */
+.gallery-section { background: var(--cream); }
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 3rem;
+}
+.gallery-grid img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  transition: transform .4s ease;
+  cursor: pointer;
+}
+.gallery-grid img:hover { transform: scale(1.03); }
+
+/* ── CTA Banner ── */
+.cta-banner {
+  background: var(--green);
+  padding: 6rem 0;
+}
+.cta-inner { max-width: 600px; }
+
+/* ── Responsive ── */
+@media (max-width: 1000px) {
+  .values-grid { grid-template-columns: 1fr 1fr; }
+  .team-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 800px) {
+  .story-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .story-images { height: 300px; }
+  .gallery-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .about-hero { height: 60vh; }
+  .values-grid { grid-template-columns: 1fr 1fr; }
+  .gallery-grid { grid-template-columns: 1fr; }
+  .story-stats { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 420px) {
+  .values-grid { grid-template-columns: 1fr; }
+}
