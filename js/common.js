@@ -61,32 +61,61 @@ function _snapshotDefaults() {
     };
   });
 }
-/* ── SINGLE IN-FLIGHT FETCH PROMISE ──────────────────────────────
-   Prevents double-fetching when both common.js and shop.js call
-   fetchSheetData() on the same DOMContentLoaded event.
+/* ── SINGLE FETCH PROMISE ─────────────────────────────────────────
+   Shared by every caller (common.js, shop.js, etc.) on the same page
+   load. The promise is kept alive for the lifetime of the page so that
+   any late caller gets the same resolved result — never triggers a
+   second fetch and never leaves stale fromSheet products behind.
 ──────────────────────────────────────────────────────────────────── */
 let _sheetFetchPromise = null;
 
 /* ── FETCH SHEET DATA ──
-   - Resets existing products to their hardcoded defaults first
+   - Clears any sheet-added products from a previous fetch FIRST
+   - Resets existing products to their hardcoded defaults
    - Then applies only the fields present in the sheet row
    - Adds brand-new products from the sheet (id not in PRODUCT_CATALOGUE)
    - Reads offers tab if OFFERS_CSV_URL is set
    - Returns { productsChanged, offers[] }
 */
 async function fetchSheetData() {
-  // Return the same promise if a fetch is already in progress
+  // Always return the same promise — one fetch per page load, period.
+  // Do NOT clear _sheetFetchPromise after resolve; late callers (shop.js)
+  // must reuse it or they trigger a second fetch on a half-applied catalogue.
   if (_sheetFetchPromise) return _sheetFetchPromise;
 
   _sheetFetchPromise = (async () => {
     const result = { productsChanged: false, offers: [] };
     if (!SHEETS_CSV_URL) return result;
 
-    // FIX: Safe cache-buster — handles URLs with or without existing query params
+    // Safe cache-buster — handles URLs with or without existing query params
     function bustCache(url) {
       const sep = url.includes('?') ? '&' : '?';
       return url + sep + 't=' + Date.now();
     }
+
+    // ── Step 1: Remove any fromSheet products BEFORE the fetch ──
+    // Doing this first means the catalogue is always clean even if the
+    // network request fails — no stale sheet-only products ever linger.
+    for (let i = PRODUCT_CATALOGUE.length - 1; i >= 0; i--) {
+      if (PRODUCT_CATALOGUE[i].fromSheet) {
+        PRODUCT_CATALOGUE.splice(i, 1);
+        result.productsChanged = true;
+      }
+    }
+
+    // ── Step 2: Reset all built-in products to their hardcoded defaults ──
+    // Ensures fields removed from the sheet are properly cleared.
+    PRODUCT_CATALOGUE.forEach(p => {
+      const def = _CATALOGUE_DEFAULTS[p.id];
+      if (!def) return;
+      p.name     = def.name;
+      p.price    = def.price;
+      p.oldPrice = def.oldPrice;
+      p.badge    = def.badge;
+      p.category = def.category;
+      p.active   = def.active;
+      p.imgs     = [...def.imgs];
+    });
 
     try {
       // Force fresh data — bypass browser cache completely
@@ -101,26 +130,6 @@ async function fetchSheetData() {
 
       const rows = parseCSV(await res.text());
       if (!rows.length) return result;
-
-      // ── Step 1: Reset all built-in products to their hardcoded defaults ──
-      // This ensures fields removed from the sheet are properly cleared.
-      PRODUCT_CATALOGUE.forEach(p => {
-        const def = _CATALOGUE_DEFAULTS[p.id];
-        if (!def) return; // sheet-only product — leave as-is
-        p.name     = def.name;
-        p.price    = def.price;
-        p.oldPrice = def.oldPrice;
-        p.badge    = def.badge;
-        p.category = def.category;
-        p.active   = def.active;
-        p.imgs     = [...def.imgs];
-      });
-
-      // ── Step 2: Remove any products that were added from the sheet in a
-      //    previous call (so they don't accumulate across re-fetches) ──
-      for (let i = PRODUCT_CATALOGUE.length - 1; i >= 0; i--) {
-        if (PRODUCT_CATALOGUE[i].fromSheet) PRODUCT_CATALOGUE.splice(i, 1);
-      }
 
       // ── Step 3: Apply sheet rows ──
       rows.forEach(row => {
@@ -198,14 +207,9 @@ async function fetchSheetData() {
     return result;
   })();
 
-  // FIX: Clear the promise AFTER all .then() consumers have finished,
-  // using chained .then()/.catch() instead of .finally() which cleared too early
-  // and allowed duplicate fetches to slip through.
-  _sheetFetchPromise = _sheetFetchPromise.then(
-    result => { _sheetFetchPromise = null; return result; },
-    err    => { _sheetFetchPromise = null; throw err; }
-  );
-
+  // NOTE: _sheetFetchPromise is intentionally NOT cleared after resolve.
+  // Any late caller (shop.js, etc.) reuses this same resolved promise —
+  // no second fetch, no double-apply, no stale fromSheet products.
   return _sheetFetchPromise;
 }
 
@@ -1073,20 +1077,39 @@ function updateHomeFeaturedCards() {
     const oldEl   = card.querySelector('.price-old');
     const badgeEl = card.querySelector('.product-badge');
     const cartBtn = card.querySelector('.add-to-cart');
-    if (!nameEl || !priceEl) return;
-    const prod = PRODUCT_CATALOGUE.find(p => p.name === nameEl.textContent.trim());
+    if (!priceEl) return;
+
+    // FIX 1: Match by data-id (reliable) first, fall back to name match.
+    // Name-only matching silently skips cards whose <h3> text has any
+    // whitespace difference vs the catalogue, causing the 4th card to miss.
+    const cardId = parseInt(card.dataset.id);
+    const prod = cardId
+      ? PRODUCT_CATALOGUE.find(p => p.id === cardId)
+      : nameEl
+        ? PRODUCT_CATALOGUE.find(p => p.name === nameEl.textContent.trim())
+        : null;
     if (!prod) return;
-    priceEl.textContent = '₹' + prod.price.toLocaleString();
-    if (cartBtn) cartBtn.dataset.price = prod.price;
+
+    // FIX 2: Always write ₹ here — never trust whatever symbol the HTML had.
+    priceEl.textContent = '\u20B9' + prod.price.toLocaleString('en-IN');
+
+    // FIX 3: Store price as a plain number in data-price so addToCart gets a
+    // number, not a string — prevents "$1299" or string-price bugs in the cart.
+    if (cartBtn) {
+      cartBtn.dataset.price = prod.price;
+      cartBtn.dataset.name  = prod.name;
+    }
+
     if (prod.oldPrice) {
-      if (oldEl) { oldEl.textContent = '₹' + prod.oldPrice.toLocaleString(); oldEl.style.display = ''; }
+      if (oldEl) { oldEl.textContent = '\u20B9' + prod.oldPrice.toLocaleString('en-IN'); oldEl.style.display = ''; }
       else {
         const s = document.createElement('span');
         s.className = 'price-old';
-        s.textContent = '₹' + prod.oldPrice.toLocaleString();
+        s.textContent = '\u20B9' + prod.oldPrice.toLocaleString('en-IN');
         priceEl.after(s);
       }
     } else if (oldEl) { oldEl.style.display = 'none'; }
+
     if (badgeEl && prod.badge) badgeEl.textContent = prod.badge;
   });
 }
@@ -1113,7 +1136,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.add-to-cart').forEach(btn => {
     btn.addEventListener('click', e => {
       e.preventDefault();
-      addToCart({ name: btn.dataset.name, price: btn.dataset.price });
+      // FIX: Always parse price as a number — dataset values are strings,
+      // and a stale HTML data-price like "$1299" would break cart totals.
+      addToCart({ name: btn.dataset.name, price: Number(btn.dataset.price) });
       showToast(`${btn.dataset.name} added to cart`);
     });
   });
@@ -1133,6 +1158,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const pid = parseInt(params.get('product'));
   if (pid) setTimeout(() => openProductModal(pid), 400);
 
+  // FIX: Run immediately so cards show ₹ from hardcoded catalogue right away,
+  // before the sheet fetch completes (prevents dollar sign flash on 4th card).
+  updateHomeFeaturedCards();
+
   // Load sheet data — updates prices AND applies hero offers
   fetchSheetData().then(({ productsChanged, offers }) => {
     // Re-render shop grid if prices changed — but only if shop.js hasn't already
@@ -1141,7 +1170,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (productsChanged && typeof renderGrid === 'function' && !document.getElementById('shopGrid')) renderGrid();
     // Apply hero offers if any are defined in the offers sheet tab
     if (offers && offers.length) applyHeroOffer(offers[0]);
-    // Update home page featured cards with sheet prices
-  });
+    // FIX: was outside .then() — must run AFTER sheet prices are applied
     updateHomeFeaturedCards();
   });
+});
