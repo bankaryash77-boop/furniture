@@ -118,6 +118,43 @@ function renderPagination() {
   });
 }
 
+    (function() {
+      const btn      = document.getElementById('mobileFilterBtn');
+      const sidebar  = document.getElementById('shopSidebar');
+      const overlay  = document.getElementById('sidebarOverlay');
+      const closeBtn = document.getElementById('sidebarCloseBtn');
+      const activeDot = document.getElementById('filterActiveDot');
+
+      function openSidebar()  { sidebar.classList.add('open'); overlay.classList.add('open'); document.body.style.overflow = 'hidden'; }
+      function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('open'); document.body.style.overflow = ''; }
+
+      btn?.addEventListener('click', openSidebar);
+      overlay?.addEventListener('click', closeSidebar);
+      closeBtn?.addEventListener('click', closeSidebar);
+
+      // Close sidebar when Apply Filters is tapped on mobile
+      document.getElementById('applyBtn')?.addEventListener('click', () => {
+        if (window.innerWidth <= 860) closeSidebar();
+      });
+
+      // Show amber dot on filter button when non-default filters are active
+      function updateActiveDot() {
+        const cat   = document.querySelector('input[name="cat"]:checked')?.value;
+        const rating = document.querySelector('input[name="rating"]:checked')?.value;
+        const price = document.getElementById('priceRange')?.value;
+        const search = document.getElementById('searchInput')?.value?.trim();
+        const isDefault = cat === 'all' && rating === '0' && price === '25000' && !search;
+        activeDot?.classList.toggle('visible', !isDefault);
+      }
+
+      document.querySelectorAll('input[name="cat"], input[name="rating"]').forEach(r => r.addEventListener('change', updateActiveDot));
+      document.getElementById('priceRange')?.addEventListener('input', updateActiveDot);
+      document.getElementById('searchInput')?.addEventListener('input', updateActiveDot);
+      document.getElementById('clearFilters')?.addEventListener('click', () => { setTimeout(updateActiveDot, 50); });
+    })();
+  
+
+
 /* ── APPLY FILTERS ── */
 function applyFilters() {
   const cat    = document.querySelector('input[name="cat"]:checked')?.value || 'all';
